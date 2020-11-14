@@ -16,3 +16,6 @@ class EstoqueBusiness:
     
     def retirar_do_estoque_por_nome(self, nome):
         return self.estoque_repository.retirar_do_estoque_por_nome(nome)
+
+    def retirar_do_estoque_por_id(self, _id):
+        return self.estoque_repository.retirar_do_estoque_por_id(_id)

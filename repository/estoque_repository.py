@@ -1,10 +1,10 @@
-from model.item import Item
-from typing import List
+from datetime import datetime
+from modelDTO.item import ItemDTO
 import sqlite3
 
 class EstoqueRepository:
 
-    def adicionar_item(self, item: Item) -> bool:
+    def adicionar_item(self, item: ItemDTO) -> bool:
         try:
             conn = sqlite3.connect('./banco.db')
             cursor = conn.cursor()
@@ -28,7 +28,8 @@ class EstoqueRepository:
         cursor.execute(f"""
         SELECT * 
         FROM estoque
-        WHERE nome = '{nome}';
+        WHERE nome = '{nome}'
+        AND item_excluido IS NULL;
         """)
 
         resultados_cursor = cursor.fetchall()
@@ -40,7 +41,9 @@ class EstoqueRepository:
         cursor = conn.cursor()
 
         cursor.execute("""
-        SELECT * FROM estoque;
+        SELECT * 
+        FROM estoque
+        WHERE item_excluido IS NULL;
         """)
 
         resultados_cursor = cursor.fetchall()
@@ -53,13 +56,33 @@ class EstoqueRepository:
             cursor = conn.cursor()
             cursor.execute(f"""
             UPDATE estoque
-            SET item_excluido = 1
+            SET item_excluido = 1,
+            data_exclusao = '{str(datetime.now().replace(microsecond=0))}'
             WHERE id = (
                 SELECT id
                 FROM estoque 
                 WHERE nome='{nome}'
-                AND item_excluido = NULL
+                AND item_excluido IS NULL
                 LIMIT 1)
+            """)
+            conn.commit()
+            conn.close()
+    
+        except Exception as err:
+            print(err)
+            return False
+
+        return True
+
+    def retirar_do_estoque_por_id(self, _id: int):
+        try:
+            conn = sqlite3.connect('./banco.db')
+            cursor = conn.cursor()
+            cursor.execute(f"""
+            UPDATE estoque
+            SET item_excluido = 1,
+            data_exclusao = '{str(datetime.now().replace(microsecond=0))}'
+            WHERE id = '{_id}' AND item_excluido IS NULL
             """)
             conn.commit()
             conn.close()
