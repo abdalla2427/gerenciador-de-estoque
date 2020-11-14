@@ -11,7 +11,7 @@ CREATE TABLE estoque (
         descricao VARCHAR(255),
         data_inclusao DATE NOT NULL,
         data_exclusao DATE,
-        item_excluido INTEGER NOT NULL
+        item_excluido INTEGER NULL
 );
 """)
 
